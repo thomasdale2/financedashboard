@@ -3,8 +3,7 @@ import pandas as pd
 import requests
 import plotly.express as px
 
-
-API_KEY = st.secrets["ALPHA_VANTAGE_API_KEY"] 
+API_KEY = st.secrets["ALPHA_VANTAGE_API_KEY"]
 BASE_URL = "https://www.alphavantage.co/query"
 
 # Function to fetch stock data
@@ -26,24 +25,21 @@ def get_stock_data(ticker):
     else:
         return None
 
-# Function to filter stocks based on criteria
+# Function to fetch stock fundamentals
+def get_stock_fundamentals(ticker):
+    params = {
+        "function": "OVERVIEW",
+        "symbol": ticker,
+        "apikey": API_KEY
+    }
+    response = requests.get(BASE_URL, params=params)
+    data = response.json()
+    return data if "Symbol" in data else None
+
+# Function to filter stocks dynamically
 def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min):
-    # Placeholder for actual stock screening logic
-    stocks = pd.DataFrame({
-        "Ticker": ["AAPL", "MSFT", "GOOGL"],
-        "P/E Ratio": [28, 35, 30],
-        "Industry": ["Tech", "Tech", "Tech"],
-        "EPS": [5.5, 7.2, 6.8],
-        "Growth Rate": [10, 12, 15]
-    })
-    
-    filtered_stocks = stocks[(stocks["P/E Ratio"] >= pe_min) & (stocks["P/E Ratio"] <= pe_max) &
-                              (stocks["EPS"] >= eps_min) & (stocks["Growth Rate"] >= growth_min)]
-    
-    if industry != "All":
-        filtered_stocks = filtered_stocks[filtered_stocks["Industry"] == industry]
-    
-    return filtered_stocks
+    # Placeholder for actual API or database call
+    return pd.DataFrame()  # Implement a real stock screener API or database query
 
 # Streamlit UI
 st.title("Stock Screener and Price Dashboard")
@@ -72,3 +68,16 @@ if st.button("Show Performance"):
     else:
         st.error("Failed to retrieve stock data. Please check the ticker symbol or try again later.")
 
+# Stock Fundamentals
+st.header("Stock Fundamentals")
+if st.button("Show Fundamentals"):
+    fundamentals = get_stock_fundamentals(ticker)
+    if fundamentals:
+        st.write(f"### {fundamentals['Name']} ({fundamentals['Symbol']})")
+        st.write(f"- **Sector:** {fundamentals['Sector']}")
+        st.write(f"- **Industry:** {fundamentals['Industry']}")
+        st.write(f"- **P/E Ratio:** {fundamentals['PERatio']}")
+        st.write(f"- **EPS:** {fundamentals['EPS']}")
+        st.write(f"- **Market Cap:** {fundamentals['MarketCapitalization']}")
+    else:
+        st.error("Failed to retrieve fundamentals. Please check the ticker symbol or try again later.")
