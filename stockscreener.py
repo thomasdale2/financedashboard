@@ -3,7 +3,8 @@ import pandas as pd
 import requests
 import plotly.express as px
 
-API_KEY = "NOHOAPQDZFQUZCO3"
+
+API_KEY = st.secrets["ALPHA_VANTAGE_API_KEY"] 
 BASE_URL = "https://www.alphavantage.co/query"
 
 # Function to fetch stock data
