@@ -73,7 +73,7 @@ if st.sidebar.button("Screen Stocks"):
     # Pagination
     page_size = 10
     total_rows = results.shape[0]
-    total_pages = total_rows // page_size + (total_rows % page_size > 0)
+    total_pages = max(1, total_rows // page_size + (total_rows % page_size > 0))
     page_num = st.sidebar.number_input("Page", min_value=1, max_value=total_pages, value=1, step=1)
     start_row = (page_num - 1) * page_size
     end_row = start_row + page_size
