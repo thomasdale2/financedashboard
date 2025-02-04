@@ -57,7 +57,7 @@ pe_max = st.sidebar.number_input("Max P/E Ratio", value=40)
 industry = st.sidebar.selectbox("Industry", ["All", "Tech", "Healthcare", "Finance"])
 eps_min = st.sidebar.number_input("Min EPS", value=0.0)
 growth_min = st.sidebar.number_input("Min Growth Rate (%)", value=0.0)
-tickers_input = st.sidebar.text_area("Enter Stock Tickers (comma-separated)", "AAPL, MSFT, GOOGL, AMZN, TSLA")
+tickers_input = st.sidebar.text_area("Enter Stock Tickers (comma-separated)", "")
 
 if st.sidebar.button("Screen Stocks"):
     tickers = [ticker.strip() for ticker in tickers_input.split(",")]
