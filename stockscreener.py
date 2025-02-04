@@ -19,19 +19,13 @@ def get_stock_fundamentals(ticker):
     return info if "symbol" in info else None
 
 # Function to filter stocks dynamically
-def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min):
-    # Placeholder for actual API or database call
-    return pd.DataFrame()  # Implement a real stock screener API or database query
-    
-def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min):
-    # List of sample tickers for demonstration purposes
-    tickers = []
-    
+def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min, tickers):
     filtered_stocks = []
-    
+
     for ticker in tickers:
         stock = yf.Ticker(ticker)
         info = stock.info
+        
         if "trailingPE" in info and "trailingEps" in info and "sector" in info and "industry" in info:
             pe_ratio = info["trailingPE"]
             eps = info["trailingEps"]
@@ -42,7 +36,7 @@ def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min):
                 eps >= eps_min and
                 info.get("revenueGrowth", 0) * 100 >= growth_min and
                 (industry == "All" or industry == industry_info)):
-                
+
                 filtered_stocks.append({
                     "Ticker": ticker,
                     "P/E Ratio": pe_ratio,
@@ -52,7 +46,7 @@ def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min):
                 })
     
     return pd.DataFrame(filtered_stocks)
-    
+
 # Streamlit UI
 st.title("Stock Screener and Price Dashboard")
 
@@ -63,9 +57,11 @@ pe_max = st.sidebar.number_input("Max P/E Ratio", value=40)
 industry = st.sidebar.selectbox("Industry", ["All", "Tech", "Healthcare", "Finance"])
 eps_min = st.sidebar.number_input("Min EPS", value=0.0)
 growth_min = st.sidebar.number_input("Min Growth Rate (%)", value=0.0)
+tickers_input = st.sidebar.text_area("Enter Stock Tickers (comma-separated)", "AAPL, MSFT, GOOGL, AMZN, TSLA")
 
 if st.sidebar.button("Screen Stocks"):
-    results = filter_stocks(pe_min, pe_max, industry, eps_min, growth_min)
+    tickers = [ticker.strip() for ticker in tickers_input.split(",")]
+    results = filter_stocks(pe_min, pe_max, industry, eps_min, growth_min, tickers)
     st.write("### Filtered Stocks")
     st.dataframe(results)
 
