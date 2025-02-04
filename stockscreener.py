@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import yfinance as yf
 import plotly.express as px
+from yahooquery import Screener
 
 # Function to fetch stock data
 def get_stock_data(ticker):
@@ -18,12 +19,12 @@ def get_stock_fundamentals(ticker):
     info = stock.info
     return info if "symbol" in info else None
 
-# Function to get a list of tickers from an index (e.g., S&P 500)
+# Function to get a list of tickers from S&P 500
 def get_sp500_tickers():
-    sp500 = yf.Ticker("^GSPC")
-    components = sp500.splits
-    tickers = components.index.tolist()
-    return tickers[:100]  # Limit to first 100 tickers for demonstration
+    s = Screener()
+    data = s.get_screeners('all_usa', count=100)
+    tickers = data['all_usa']['quotes']
+    return [ticker['symbol'] for ticker in tickers]
 
 # Function to filter stocks dynamically
 def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min):
