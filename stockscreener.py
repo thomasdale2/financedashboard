@@ -1,16 +1,29 @@
-pip install yfinance
-
-
 import streamlit as st
 import pandas as pd
-import yfinance as yf
+import requests
 import plotly.express as px
+
+API_KEY = "NOHOAPQDZFQUZCO3"
+BASE_URL = "https://www.alphavantage.co/query"
 
 # Function to fetch stock data
 def get_stock_data(ticker):
-    stock = yf.Ticker(ticker)
-    hist = stock.history(period="1y")
-    return hist
+    params = {
+        "function": "TIME_SERIES_DAILY_ADJUSTED",
+        "symbol": ticker,
+        "apikey": API_KEY,
+        "outputsize": "compact"
+    }
+    response = requests.get(BASE_URL, params=params)
+    data = response.json()
+    
+    if "Time Series (Daily)" in data:
+        df = pd.DataFrame.from_dict(data["Time Series (Daily)"], orient="index", dtype=float)
+        df.index = pd.to_datetime(df.index)
+        df = df.sort_index()
+        return df
+    else:
+        return None
 
 # Function to filter stocks based on criteria
 def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min):
@@ -52,5 +65,9 @@ st.header("Stock Price Performance")
 ticker = st.text_input("Enter Stock Ticker (e.g., AAPL)", "AAPL")
 if st.button("Show Performance"):
     data = get_stock_data(ticker)
-    fig = px.line(data, x=data.index, y="Close", title=f"{ticker} Price Performance")
-    st.plotly_chart(fig)
+    if data is not None:
+        fig = px.line(data, x=data.index, y="5. adjusted close", title=f"{ticker} Price Performance")
+        st.plotly_chart(fig)
+    else:
+        st.error("Failed to retrieve stock data. Please check the ticker symbol or try again later.")
+
