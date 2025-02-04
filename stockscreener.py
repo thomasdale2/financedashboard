@@ -18,8 +18,17 @@ def get_stock_fundamentals(ticker):
     info = stock.info
     return info if "symbol" in info else None
 
+# Function to get a list of tickers from an index (e.g., S&P 500)
+def get_sp500_tickers():
+    sp500 = yf.Ticker("^GSPC")
+    components = sp500.splits
+    tickers = components.index.tolist()
+    return tickers[:100]  # Limit to first 100 tickers for demonstration
+
 # Function to filter stocks dynamically
-def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min, tickers):
+def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min):
+    tickers = get_sp500_tickers()
+
     filtered_stocks = []
 
     for ticker in tickers:
@@ -57,11 +66,9 @@ pe_max = st.sidebar.number_input("Max P/E Ratio", value=40)
 industry = st.sidebar.selectbox("Industry", ["All", "Tech", "Healthcare", "Finance"])
 eps_min = st.sidebar.number_input("Min EPS", value=0.0)
 growth_min = st.sidebar.number_input("Min Growth Rate (%)", value=0.0)
-tickers_input = st.sidebar.text_area("Enter Stock Tickers (comma-separated)", "AAPL, MSFT, GOOGL, AMZN, TSLA")
 
 if st.sidebar.button("Screen Stocks"):
-    tickers = [ticker.strip() for ticker in tickers_input.split(",")]
-    results = filter_stocks(pe_min, pe_max, industry, eps_min, growth_min, tickers)
+    results = filter_stocks(pe_min, pe_max, industry, eps_min, growth_min)
     
     # Pagination
     page_size = 10
