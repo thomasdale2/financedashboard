@@ -22,7 +22,37 @@ def get_stock_fundamentals(ticker):
 def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min):
     # Placeholder for actual API or database call
     return pd.DataFrame()  # Implement a real stock screener API or database query
-
+    
+def filter_stocks(pe_min, pe_max, industry, eps_min, growth_min):
+    # List of sample tickers for demonstration purposes
+    tickers = []
+    
+    filtered_stocks = []
+    
+    for ticker in tickers:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        if "trailingPE" in info and "trailingEps" in info and "sector" in info and "industry" in info:
+            pe_ratio = info["trailingPE"]
+            eps = info["trailingEps"]
+            sector = info["sector"]
+            industry_info = info["industry"]
+            
+            if (pe_min <= pe_ratio <= pe_max and
+                eps >= eps_min and
+                info.get("revenueGrowth", 0) * 100 >= growth_min and
+                (industry == "All" or industry == industry_info)):
+                
+                filtered_stocks.append({
+                    "Ticker": ticker,
+                    "P/E Ratio": pe_ratio,
+                    "Industry": industry_info,
+                    "EPS": eps,
+                    "Growth Rate (%)": info.get("revenueGrowth", 0) * 100
+                })
+    
+    return pd.DataFrame(filtered_stocks)
+    
 # Streamlit UI
 st.title("Stock Screener and Price Dashboard")
 
