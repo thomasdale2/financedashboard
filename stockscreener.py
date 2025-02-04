@@ -57,13 +57,22 @@ pe_max = st.sidebar.number_input("Max P/E Ratio", value=40)
 industry = st.sidebar.selectbox("Industry", ["All", "Tech", "Healthcare", "Finance"])
 eps_min = st.sidebar.number_input("Min EPS", value=0.0)
 growth_min = st.sidebar.number_input("Min Growth Rate (%)", value=0.0)
-tickers_input = st.sidebar.text_area("Enter Stock Tickers (comma-separated)", "")
+tickers_input = st.sidebar.text_area("Enter Stock Tickers (comma-separated)", "AAPL, MSFT, GOOGL, AMZN, TSLA")
 
 if st.sidebar.button("Screen Stocks"):
     tickers = [ticker.strip() for ticker in tickers_input.split(",")]
     results = filter_stocks(pe_min, pe_max, industry, eps_min, growth_min, tickers)
+    
+    # Pagination
+    page_size = 10
+    total_rows = results.shape[0]
+    total_pages = total_rows // page_size + (total_rows % page_size > 0)
+    page_num = st.sidebar.number_input("Page", min_value=1, max_value=total_pages, value=1, step=1)
+    start_row = (page_num - 1) * page_size
+    end_row = start_row + page_size
+    
     st.write("### Filtered Stocks")
-    st.dataframe(results)
+    st.dataframe(results.iloc[start_row:end_row])
 
 # Stock Price Chart
 st.header("Stock Price Performance")
